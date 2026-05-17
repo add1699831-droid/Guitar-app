@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>大調音階查看器</title>
+
+<style>
+
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    padding:40px;
+}
+
+.box{
+    max-width:700px;
+    margin:auto;
+    background:#222;
+    padding:30px;
+    border-radius:20px;
+}
+
+h1{
+    text-align:center;
+}
+
+select{
+    width:100%;
+    padding:12px;
+    font-size:20px;
+    margin-top:20px;
+    border-radius:10px;
+}
+
+.card{
+    background:#333;
+    padding:20px;
+    margin-top:20px;
+    border-radius:15px;
+}
+
+.notes{
+    font-size:30px;
+    line-height:2;
+}
+
+.sharp{
+    color:#00ff99;
+}
+
+.flat{
+    color:#66bbff;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>🎵 大調音階產生器</h1>
+
+<select id="key">
+    <option>C</option>
+    <option>G</option>
+    <option>D</option>
+    <option>A</option>
+    <option>E</option>
+    <option>B</option>
+    <option>F#</option>
+
+    <option>F</option>
+    <option>Bb</option>
+    <option>Eb</option>
+    <option>Ab</option>
+</select>
+
+<div class="card">
+    <h2>音階</h2>
+    <div class="notes" id="scale"></div>
+</div>
+
+<div class="card">
+    <h2>和弦</h2>
+    <div class="notes" id="chords"></div>
+</div>
+
+<div class="card">
+    <h2>升降記號</h2>
+    <div class="notes" id="info"></div>
+</div>
+
+</div>
+
+<script>
+
+const scales = {
+
+"C":["C","D","E","F","G","A","B"],
+
+"G":["G","A","B","C","D","E","F#"],
+
+"D":["D","E","F#","G","A","B","C#"],
+
+"A":["A","B","C#","D","E","F#","G#"],
+
+"E":["E","F#","G#","A","B","C#","D#"],
+
+"B":["B","C#","D#","E","F#","G#","A#"],
+
+"F#":["F#","G#","A#","B","C#","D#","E#"],
+
+"F":["F","G","A","Bb","C","D","E"],
+
+"Bb":["Bb","C","D","Eb","F","G","A"],
+
+"Eb":["Eb","F","G","Ab","Bb","C","D"],
+
+"Ab":["Ab","Bb","C","Db","Eb","F","G"]
+
+};
+
+const chordType = [
+"Maj",
+"min",
+"min",
+"Maj",
+"Maj",
+"min",
+"dim"
+];
+
+const infos = {
+
+"C":"沒有升降記號",
+
+"G":"1個升記號 F#",
+
+"D":"2個升記號 F# C#",
+
+"A":"3個升記號 F# C# G#",
+
+"E":"4個升記號 F# C# G# D#",
+
+"B":"5個升記號",
+
+"F#":"6個升記號",
+
+"F":"1個降記號 Bb",
+
+"Bb":"2個降記號 Bb Eb",
+
+"Eb":"3個降記號 Bb Eb Ab",
+
+"Ab":"4個降記號 Bb Eb Ab Db"
+
+};
+
+function colorNote(note){
+
+    if(note.includes("#")){
+        return "<span class='sharp'>" + note + "</span>";
+    }
+
+    if(note.includes("b")){
+        return "<span class='flat'>" + note + "</span>";
+    }
+
+    return note;
+}
+
+function update(){
+
+    const key = document.getElementById("key").value;
+
+    const notes = scales[key];
+
+    let scaleHTML = "";
+
+    let chordHTML = "";
+
+    for(let i=0;i<notes.length;i++){
+
+        scaleHTML += colorNote(notes[i]) + " ";
+
+        chordHTML +=
+            colorNote(notes[i]) +
+            " " +
+            chordType[i] +
+            "<br>";
+    }
+
+    document.getElementById("scale").innerHTML = scaleHTML;
+
+    document.getElementById("chords").innerHTML = chordHTML;
+
+    document.getElementById("info").innerHTML = infos[key];
+}
+
+update();
+
+document
+.getElementById("key")
+.addEventListener("change",update);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1652 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>和弦指南</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f3ec;
+        --ink: #202022;
+        --muted: #68645d;
+        --line: rgba(32, 32, 34, 0.14);
+        --paper: #fffdf8;
+        --paper-2: #f8efe4;
+        --root: #d84f3d;
+        --third: #24706f;
+        --fifth: #2f5aa8;
+        --seventh: #8b4aa7;
+        --accent: #e2aa42;
+        --shadow: 0 18px 45px rgba(51, 43, 32, 0.16);
+        --radius: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.4)),
+          repeating-linear-gradient(90deg, rgba(32, 32, 34, 0.035) 0 1px, transparent 1px 28px),
+          var(--bg);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Noto Sans TC", sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app-shell {
+        min-height: 100vh;
+      }
+
+      .top-band {
+        background: #232323;
+        color: #fffdf8;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .hero {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 22px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+        gap: 28px;
+        align-items: end;
+      }
+
+      .eyebrow {
+        color: #f1c86d;
+        font-size: 0.78rem;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 780px;
+        font-size: clamp(2.1rem, 4.6vw, 5rem);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .hero-copy {
+        margin: 18px 0 0;
+        max-width: 650px;
+        color: rgba(255, 253, 248, 0.76);
+        font-size: 1.05rem;
+        line-height: 1.7;
+      }
+
+      .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .stat {
+        padding: 16px 14px;
+        background: rgba(255, 255, 255, 0.07);
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.5rem;
+        line-height: 1;
+      }
+
+      .stat span {
+        display: block;
+        margin-top: 8px;
+        color: rgba(255, 253, 248, 0.66);
+        font-size: 0.85rem;
+      }
+
+      .control-band {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid var(--line);
+        background: rgba(246, 243, 236, 0.9);
+        backdrop-filter: blur(18px);
+      }
+
+      .controls {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 14px 0;
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) auto;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .search-field {
+        position: relative;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        width: 19px;
+        height: 19px;
+        transform: translateY(-50%);
+        color: #77716a;
+        pointer-events: none;
+      }
+
+      .search-input {
+        width: 100%;
+        min-height: 48px;
+        padding: 0 44px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        color: var(--ink);
+        outline: none;
+        box-shadow: 0 8px 24px rgba(51, 43, 32, 0.08);
+      }
+
+      .search-input:focus {
+        border-color: rgba(216, 79, 61, 0.55);
+        box-shadow: 0 0 0 4px rgba(216, 79, 61, 0.12);
+      }
+
+      .clear-search {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: #68645d;
+        transform: translateY(-50%);
+        display: grid;
+        place-items: center;
+      }
+
+      .clear-search:hover {
+        background: rgba(32, 32, 34, 0.08);
+      }
+
+      .filter-tabs {
+        display: inline-grid;
+        grid-auto-flow: column;
+        gap: 6px;
+        padding: 5px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 253, 248, 0.72);
+      }
+
+      .filter-tab {
+        min-height: 38px;
+        padding: 0 14px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .filter-tab.is-active {
+        background: #202022;
+        color: #fffdf8;
+      }
+
+      main {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 24px 0 54px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .result-count {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .mobile-hint {
+        display: none;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .scroll-actions {
+        display: none;
+        gap: 8px;
+      }
+
+      .icon-button {
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 10px 22px rgba(51, 43, 32, 0.08);
+      }
+
+      .icon-button:hover {
+        transform: translateY(-1px);
+      }
+
+      .chord-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .chord-card {
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--paper);
+        box-shadow: 0 12px 30px rgba(51, 43, 32, 0.1);
+        overflow: hidden;
+      }
+
+      .chord-card.is-featured {
+        outline: 3px solid rgba(226, 170, 66, 0.28);
+      }
+
+      .card-top {
+        padding: 18px 18px 14px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: start;
+        border-bottom: 1px solid var(--line);
+        background:
+          linear-gradient(180deg, rgba(248, 239, 228, 0.85), rgba(255, 253, 248, 0.9)),
+          var(--paper-2);
+      }
+
+      .chord-title {
+        margin: 0;
+        font-size: 1.7rem;
+        line-height: 1;
+      }
+
+      .chord-subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .category-pill {
+        align-self: start;
+        padding: 7px 9px;
+        border-radius: 999px;
+        background: #202022;
+        color: #fffdf8;
+        font-size: 0.78rem;
+        white-space: nowrap;
+      }
+
+      .card-body {
+        padding: 16px 18px 18px;
+      }
+
+      .diagram-wrap {
+        display: grid;
+        grid-template-columns: minmax(160px, 1fr) minmax(130px, 0.72fr);
+        gap: 14px;
+        align-items: start;
+      }
+
+      .fretboard {
+        position: relative;
+        height: 240px;
+        min-width: 160px;
+        border-radius: var(--radius);
+        background:
+          linear-gradient(90deg, transparent 0 7%, rgba(32, 32, 34, 0.24) 7.4% 7.8%, transparent 8.2% 25%, rgba(32, 32, 34, 0.24) 25.4% 25.8%, transparent 26.2% 43%, rgba(32, 32, 34, 0.24) 43.4% 43.8%, transparent 44.2% 61%, rgba(32, 32, 34, 0.24) 61.4% 61.8%, transparent 62.2% 79%, rgba(32, 32, 34, 0.24) 79.4% 79.8%, transparent 80.2% 97%, rgba(32, 32, 34, 0.24) 97.4% 97.8%, transparent 98.2%),
+          linear-gradient(180deg, rgba(32, 32, 34, 0.85) 34px, rgba(32, 32, 34, 0.22) 35px, transparent 36px),
+          repeating-linear-gradient(180deg, transparent 35px 74px, rgba(32, 32, 34, 0.18) 75px 76px),
+          #fdf6eb;
+        border: 1px solid rgba(32, 32, 34, 0.16);
+      }
+
+      .base-fret {
+        position: absolute;
+        left: 8px;
+        top: 41px;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .string-state {
+        position: absolute;
+        top: 6px;
+        width: 24px;
+        height: 24px;
+        transform: translateX(-50%);
+        display: grid;
+        place-items: center;
+        color: #4b4742;
+        font-size: 0.8rem;
+        font-weight: 800;
+      }
+
+      .open-note {
+        position: absolute;
+        top: 28px;
+        min-width: 34px;
+        min-height: 22px;
+        padding: 3px 5px;
+        transform: translateX(-50%);
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(47, 90, 168, 0.12);
+        color: #263d73;
+        border: 1px solid rgba(47, 90, 168, 0.24);
+        font-size: 0.66rem;
+        line-height: 1;
+        font-weight: 800;
+      }
+
+      .open-note[data-degree="1"] {
+        background: rgba(216, 79, 61, 0.14);
+        color: #a13428;
+        border-color: rgba(216, 79, 61, 0.28);
+      }
+
+      .open-note[data-degree="3"],
+      .open-note[data-degree="b3"] {
+        background: rgba(36, 112, 111, 0.13);
+        color: #1f5d5c;
+        border-color: rgba(36, 112, 111, 0.28);
+      }
+
+      .open-note[data-degree="b7"],
+      .open-note[data-degree="7"] {
+        background: rgba(139, 74, 167, 0.13);
+        color: #713987;
+        border-color: rgba(139, 74, 167, 0.28);
+      }
+
+      .note-dot {
+        position: absolute;
+        width: 42px;
+        height: 42px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--fifth);
+        color: #fff;
+        box-shadow: 0 10px 18px rgba(32, 32, 34, 0.23);
+      }
+
+      .note-dot[data-degree="1"] {
+        background: var(--root);
+      }
+
+      .note-dot[data-degree="3"],
+      .note-dot[data-degree="b3"] {
+        background: var(--third);
+      }
+
+      .note-dot[data-degree="b7"],
+      .note-dot[data-degree="7"] {
+        background: var(--seventh);
+      }
+
+      .note-dot .note {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .note-dot .degree {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.68rem;
+        line-height: 1;
+        opacity: 0.9;
+      }
+
+      .side-panel {
+        display: grid;
+        gap: 12px;
+      }
+
+      .emotion-panel {
+        margin-bottom: 14px;
+        padding: 12px;
+        border: 1px solid rgba(32, 32, 34, 0.12);
+        border-radius: var(--radius);
+        background:
+          linear-gradient(135deg, rgba(226, 170, 66, 0.14), rgba(36, 112, 111, 0.08)),
+          #fffaf1;
+      }
+
+      .emotion-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 9px;
+      }
+
+      .emotion-title {
+        margin: 0;
+        color: var(--ink);
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      .emotion-meter {
+        display: inline-flex;
+        gap: 3px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 0.72rem;
+        white-space: nowrap;
+      }
+
+      .meter-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(32, 32, 34, 0.18);
+      }
+
+      .meter-dot.is-filled {
+        background: var(--root);
+      }
+
+      .emotion-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .emotion-tag {
+        min-height: 26px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(255, 253, 248, 0.88);
+        color: #3f3a34;
+        border: 1px solid rgba(32, 32, 34, 0.1);
+        font-size: 0.78rem;
+      }
+
+      .emotion-copy {
+        margin: 0;
+        color: #514b44;
+        font-size: 0.86rem;
+        line-height: 1.6;
+      }
+
+      .info-block {
+        border-left: 3px solid rgba(32, 32, 34, 0.18);
+        padding-left: 10px;
+      }
+
+      .info-label {
+        margin: 0 0 7px;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .tone-list,
+      .root-list,
+      .next-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .tone-chip,
+      .root-chip,
+      .next-chip {
+        border: 1px solid rgba(32, 32, 34, 0.12);
+        border-radius: 999px;
+        background: #fffaf1;
+        color: var(--ink);
+        min-height: 30px;
+        padding: 5px 9px;
+        font-size: 0.82rem;
+        line-height: 1.2;
+      }
+
+      .tone-chip strong {
+        color: var(--root);
+      }
+
+      .next-chip {
+        border-color: rgba(216, 79, 61, 0.22);
+        background: rgba(216, 79, 61, 0.08);
+      }
+
+      .next-chip:hover {
+        background: rgba(216, 79, 61, 0.16);
+      }
+
+      .voicing {
+        margin: 14px 0 0;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .voicing code {
+        color: var(--ink);
+        background: rgba(32, 32, 34, 0.07);
+        border-radius: 5px;
+        padding: 3px 6px;
+      }
+
+      .empty-state {
+        width: 100%;
+        padding: 44px 20px;
+        border: 1px dashed rgba(32, 32, 34, 0.22);
+        border-radius: var(--radius);
+        background: rgba(255, 253, 248, 0.72);
+        text-align: center;
+      }
+
+      .empty-state h2 {
+        margin: 0;
+        font-size: 1.35rem;
+      }
+
+      .empty-state p {
+        margin: 10px auto 0;
+        max-width: 420px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        .chord-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        body {
+          background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.52)),
+            repeating-linear-gradient(90deg, rgba(32, 32, 34, 0.04) 0 1px, transparent 1px 22px),
+            var(--bg);
+        }
+
+        .hero {
+          width: min(100% - 24px, 1180px);
+          padding: 24px 0 18px;
+          gap: 20px;
+        }
+
+        h1 {
+          font-size: clamp(2.3rem, 15vw, 4.2rem);
+        }
+
+        .hero-copy {
+          font-size: 0.98rem;
+        }
+
+        .stats-strip {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .stat {
+          padding: 12px 10px;
+        }
+
+        .stat strong {
+          font-size: 1.2rem;
+        }
+
+        .controls {
+          width: min(100% - 24px, 1180px);
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .filter-tabs {
+          display: flex;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+
+        .filter-tabs::-webkit-scrollbar {
+          display: none;
+        }
+
+        .filter-tab {
+          flex: 0 0 auto;
+          min-width: 86px;
+        }
+
+        main {
+          width: 100%;
+          padding: 20px 0 42px;
+        }
+
+        .toolbar {
+          width: min(100% - 24px, 1180px);
+          margin: 0 auto 12px;
+        }
+
+        .mobile-hint,
+        .scroll-actions {
+          display: flex;
+          align-items: center;
+        }
+
+        .result-count {
+          display: none;
+        }
+
+        .chord-grid {
+          display: flex;
+          gap: 12px;
+          overflow-x: auto;
+          padding: 2px 12px 18px;
+          scroll-snap-type: x mandatory;
+          scroll-padding-inline: 12px;
+          -webkit-overflow-scrolling: touch;
+          cursor: grab;
+        }
+
+        .chord-grid.is-dragging {
+          cursor: grabbing;
+          scroll-snap-type: none;
+        }
+
+        .chord-grid::-webkit-scrollbar {
+          height: 8px;
+        }
+
+        .chord-grid::-webkit-scrollbar-thumb {
+          background: rgba(32, 32, 34, 0.2);
+          border-radius: 999px;
+        }
+
+        .chord-card {
+          flex: 0 0 min(88vw, 390px);
+          scroll-snap-align: start;
+        }
+
+        .diagram-wrap {
+          grid-template-columns: 1fr;
+        }
+
+        .fretboard {
+          height: 260px;
+        }
+
+        .note-dot {
+          width: 46px;
+          height: 46px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .card-top,
+        .card-body {
+          padding-left: 14px;
+          padding-right: 14px;
+        }
+
+        .stats-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .toolbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .scroll-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="top-band">
+        <section class="hero" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">Chord Finder</p>
+            <h1 id="page-title">和弦一看就懂</h1>
+            <p class="hero-copy">
+              搜尋、分類、根音位置、音級與常見接法都集中在一張圖裡。從新手開放和弦到進階封閉和弦，練習時不用在多個表格之間來回跳。
+            </p>
+          </div>
+          <div class="stats-strip" aria-label="和弦資料摘要">
+            <div class="stat">
+              <strong id="stat-total">0</strong>
+              <span>可查和弦</span>
+            </div>
+            <div class="stat">
+              <strong>1 3 5</strong>
+              <span>音級標示</span>
+            </div>
+            <div class="stat">
+              <strong>b7</strong>
+              <span>七和弦辨識</span>
+            </div>
+          </div>
+        </section>
+      </header>
+
+      <section class="control-band" aria-label="搜尋與篩選">
+        <div class="controls">
+          <label class="search-field">
+            <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+              />
+            </svg>
+            <input
+              id="search"
+              class="search-input"
+              type="search"
+              autocomplete="off"
+              placeholder="搜尋 C、Am、G7、b7、常用..."
+            />
+            <button class="clear-search" id="clear-search" type="button" aria-label="清除搜尋">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-width="2"
+                  d="M6 6l12 12M18 6 6 18"
+                />
+              </svg>
+            </button>
+          </label>
+
+          <div class="filter-tabs" role="tablist" aria-label="分類篩選">
+            <button class="filter-tab is-active" type="button" data-filter="all" role="tab">
+              全部
+            </button>
+            <button class="filter-tab" type="button" data-filter="beginner" role="tab">新手</button>
+            <button class="filter-tab" type="button" data-filter="common" role="tab">常用</button>
+            <button class="filter-tab" type="button" data-filter="advanced" role="tab">進階</button>
+          </div>
+        </div>
+      </section>
+
+      <main>
+        <div class="toolbar">
+          <p class="result-count" id="result-count">顯示所有和弦</p>
+          <span class="mobile-hint">左右滑動瀏覽和弦</span>
+          <div class="scroll-actions" aria-label="行動版滑動控制">
+            <button class="icon-button" id="prev-card" type="button" aria-label="上一個和弦">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m15 18-6-6 6-6"
+                />
+              </svg>
+            </button>
+            <button class="icon-button" id="next-card" type="button" aria-label="下一個和弦">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m9 18 6-6-6-6"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <section class="chord-grid" id="chord-grid" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <template id="chord-card-template">
+      <article class="chord-card">
+        <div class="card-top">
+          <div>
+            <h2 class="chord-title"></h2>
+            <p class="chord-subtitle"></p>
+          </div>
+          <span class="category-pill"></span>
+        </div>
+        <div class="card-body">
+          <section class="emotion-panel" aria-label="情感分析">
+            <div class="emotion-header">
+              <p class="emotion-title">情感分析</p>
+              <span class="emotion-meter"></span>
+            </div>
+            <div class="emotion-tags"></div>
+            <p class="emotion-copy"></p>
+          </section>
+          <div class="diagram-wrap">
+            <div class="fretboard" aria-label="和弦指型圖"></div>
+            <div class="side-panel">
+              <div class="info-block">
+                <p class="info-label">音級</p>
+                <div class="tone-list"></div>
+              </div>
+              <div class="info-block">
+                <p class="info-label">根音位置</p>
+                <div class="root-list"></div>
+              </div>
+              <div class="info-block">
+                <p class="info-label">常接和弦</p>
+                <div class="next-list"></div>
+              </div>
+            </div>
+          </div>
+          <p class="voicing"></p>
+        </div>
+      </article>
+    </template>
+
+    <script>
+      const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+      const OPEN_STRINGS = ["E", "A", "D", "G", "B", "E"];
+      const STRING_NAMES = ["6弦", "5弦", "4弦", "3弦", "2弦", "1弦"];
+      const CATEGORY_LABELS = {
+        beginner: "新手",
+        common: "常用",
+        advanced: "進階",
+      };
+
+      const EMOTIONS = {
+        C: {
+          tension: 1,
+          tags: ["明亮", "穩定", "安心"],
+          text: "像回到家一樣穩，適合主歌開頭、結尾或需要清楚落點的地方。",
+        },
+        G: {
+          tension: 2,
+          tags: ["開闊", "推進", "期待"],
+          text: "比 C 更有往前走的力量，常用來把情緒推向下一段或副歌。",
+        },
+        D: {
+          tension: 2,
+          tags: ["清亮", "上揚", "爽朗"],
+          text: "高音弦會讓情緒變亮，適合青春、戶外感或副歌前的抬升。",
+        },
+        A: {
+          tension: 2,
+          tags: ["直接", "陽光", "俐落"],
+          text: "聲音乾淨有精神，常帶一點公路感，適合明快節奏。",
+        },
+        E: {
+          tension: 2,
+          tags: ["厚實", "自信", "粗獷"],
+          text: "低音飽滿，情緒比較有重量，適合 rock、blues 或有力量的段落。",
+        },
+        Am: {
+          tension: 2,
+          tags: ["內省", "溫柔", "微苦"],
+          text: "悲傷但不激烈，像安靜想事情，適合主歌、獨白或淡淡失落。",
+        },
+        Em: {
+          tension: 2,
+          tags: ["深沉", "空曠", "孤單"],
+          text: "比 Am 更低沉，適合夜晚、回憶、孤獨感或厚一點的民謠刷奏。",
+        },
+        Dm: {
+          tension: 3,
+          tags: ["哀傷", "細膩", "拉扯"],
+          text: "帶有明顯不安與古典感，常用來讓旋律變得更敏感。",
+        },
+        G7: {
+          tension: 4,
+          tags: ["懸念", "想解決", "轉折"],
+          text: "張力很清楚，聽起來像一句話還沒說完，最常接回 C。",
+        },
+        Cadd9: {
+          tension: 2,
+          tags: ["空氣感", "清新", "開放"],
+          text: "比 C 多一點閃光和空間，適合溫暖、透明、校園或旅行感。",
+        },
+        Fmaj7: {
+          tension: 2,
+          tags: ["柔和", "浪漫", "鬆弛"],
+          text: "帶一點慵懶與成熟感，比 F 更不硬，常用在抒情與 city pop。",
+        },
+        A7: {
+          tension: 4,
+          tags: ["俏皮", "藍調", "有鉤子"],
+          text: "有一點調皮的歪斜感，常把情緒帶去 D 或 Dm。",
+        },
+        D7: {
+          tension: 4,
+          tags: ["推動", "復古", "期待"],
+          text: "像準備轉身進下一句，常用來把和聲推回 G。",
+        },
+        E7: {
+          tension: 4,
+          tags: ["粗獷", "誘惑", "不安"],
+          text: "屬七味很重，帶 blues 的髒感，常讓 Am 或 A 更有戲。",
+        },
+        Asus4: {
+          tension: 3,
+          tags: ["懸浮", "等待", "未完成"],
+          text: "像答案先被藏起來，通常接回 A，製造一瞬間的期待。",
+        },
+        Am7: {
+          tension: 2,
+          tags: ["柔軟", "都會", "放鬆"],
+          text: "比 Am 更溫和成熟，適合 R&B、爵士流行或低聲敘事。",
+        },
+        F: {
+          tension: 2,
+          tags: ["溫暖", "堅定", "展開"],
+          text: "有支撐感，常讓進行變寬，適合副歌或情緒打開的位置。",
+        },
+        Bm: {
+          tension: 3,
+          tags: ["壓抑", "冷色", "克制"],
+          text: "小調但更緊，常帶一點距離感，適合轉入比較沉的段落。",
+        },
+        Cmaj7: {
+          tension: 2,
+          tags: ["夢幻", "成熟", "溫柔"],
+          text: "比 C 更柔、更有電影感，適合回憶、夜景或 city pop 色彩。",
+        },
+        Dm7: {
+          tension: 3,
+          tags: ["細緻", "爵士", "鋪陳"],
+          text: "不會太悲，但會把氣氛帶得更有層次，常準備接 G7。",
+        },
+        B7: {
+          tension: 5,
+          tags: ["強烈", "戲劇", "逼近"],
+          text: "張力很高，像情緒被推到門口，接 E 或 Em 時解決感很明顯。",
+        },
+        Gmaj7: {
+          tension: 2,
+          tags: ["溫柔", "漂浮", "清澈"],
+          text: "有放空感與柔光感，適合慢歌、間奏或乾淨的轉場。",
+        },
+      };
+
+      const chords = [
+        {
+          name: "C",
+          root: "C",
+          quality: "major",
+          category: "beginner",
+          aliases: ["C major", "C大調", "Do"],
+          frets: [null, 3, 2, 0, 1, 0],
+          baseFret: 1,
+          next: ["F", "G", "Am", "Dm"],
+          caption: "I 級穩定感，適合當主和弦。",
+        },
+        {
+          name: "G",
+          root: "G",
+          quality: "major",
+          category: "beginner",
+          aliases: ["G major", "G大調", "Sol"],
+          frets: [3, 2, 0, 0, 0, 3],
+          baseFret: 1,
+          next: ["C", "D", "Em", "Am"],
+          caption: "明亮開放，常作 V 或 I。",
+        },
+        {
+          name: "D",
+          root: "D",
+          quality: "major",
+          category: "beginner",
+          aliases: ["D major", "D大調", "Re"],
+          frets: [null, null, 0, 2, 3, 2],
+          baseFret: 1,
+          next: ["G", "A", "Bm", "Em"],
+          caption: "高音弦很亮，適合刷奏副歌。",
+        },
+        {
+          name: "A",
+          root: "A",
+          quality: "major",
+          category: "beginner",
+          aliases: ["A major", "A大調", "La"],
+          frets: [null, 0, 2, 2, 2, 0],
+          baseFret: 1,
+          next: ["D", "E", "F#m", "Bm"],
+          caption: "五弦根音，很多流行歌常見。",
+        },
+        {
+          name: "E",
+          root: "E",
+          quality: "major",
+          category: "beginner",
+          aliases: ["E major", "E大調", "Mi"],
+          frets: [0, 2, 2, 1, 0, 0],
+          baseFret: 1,
+          next: ["A", "B7", "C#m", "F#m"],
+          caption: "低音飽滿，是封閉和弦的母型。",
+        },
+        {
+          name: "Am",
+          root: "A",
+          quality: "minor",
+          category: "beginner",
+          aliases: ["A minor", "A小調", "Lam"],
+          frets: [null, 0, 2, 2, 1, 0],
+          baseFret: 1,
+          next: ["F", "C", "G", "Dm"],
+          caption: "自然小調色彩，指型接 C 很順。",
+        },
+        {
+          name: "Em",
+          root: "E",
+          quality: "minor",
+          category: "beginner",
+          aliases: ["E minor", "E小調", "Mim"],
+          frets: [0, 2, 2, 0, 0, 0],
+          baseFret: 1,
+          next: ["C", "G", "D", "Am"],
+          caption: "最省力的小和弦，聲音厚。",
+        },
+        {
+          name: "Dm",
+          root: "D",
+          quality: "minor",
+          category: "beginner",
+          aliases: ["D minor", "D小調", "Rem"],
+          frets: [null, null, 0, 2, 3, 1],
+          baseFret: 1,
+          next: ["G", "Am", "C", "F"],
+          caption: "帶一點拉力，常往 G 或 Am 走。",
+        },
+        {
+          name: "G7",
+          root: "G",
+          quality: "dominant7",
+          category: "common",
+          aliases: ["G dominant", "G屬七", "G 七"],
+          frets: [3, 2, 0, 0, 0, 1],
+          baseFret: 1,
+          next: ["C", "Am", "F", "Dm"],
+          caption: "V7 到 I 的解決感很強。",
+        },
+        {
+          name: "Cadd9",
+          root: "C",
+          quality: "add9",
+          category: "common",
+          aliases: ["C add 9", "C加九", "C9"],
+          frets: [null, 3, 2, 0, 3, 3],
+          baseFret: 1,
+          next: ["G", "D", "Em", "Am"],
+          caption: "保留開放弦空氣感，適合民謠刷奏。",
+        },
+        {
+          name: "Fmaj7",
+          root: "F",
+          quality: "major7",
+          category: "common",
+          aliases: ["F major 7", "F大七", "F△7"],
+          frets: [null, null, 3, 2, 1, 0],
+          baseFret: 1,
+          next: ["G", "C", "Am", "Dm"],
+          caption: "比大橫按 F 更柔，常接 C 或 G。",
+        },
+        {
+          name: "A7",
+          root: "A",
+          quality: "dominant7",
+          category: "common",
+          aliases: ["A dominant", "A屬七", "A 七"],
+          frets: [null, 0, 2, 0, 2, 0],
+          baseFret: 1,
+          next: ["D", "Dm", "E", "Bm"],
+          caption: "帶藍調感，往 D 解決很自然。",
+        },
+        {
+          name: "D7",
+          root: "D",
+          quality: "dominant7",
+          category: "common",
+          aliases: ["D dominant", "D屬七", "D 七"],
+          frets: [null, null, 0, 2, 1, 2],
+          baseFret: 1,
+          next: ["G", "Em", "C", "A7"],
+          caption: "常見 V7，讓下一個 G 更有落點。",
+        },
+        {
+          name: "E7",
+          root: "E",
+          quality: "dominant7",
+          category: "common",
+          aliases: ["E dominant", "E屬七", "E 七"],
+          frets: [0, 2, 0, 1, 0, 0],
+          baseFret: 1,
+          next: ["A", "Am", "B7", "F#m"],
+          caption: "六弦根音的屬七，常用在 blues。",
+        },
+        {
+          name: "Asus4",
+          root: "A",
+          quality: "sus4",
+          category: "common",
+          aliases: ["A sus", "A掛四", "Asus"],
+          frets: [null, 0, 2, 2, 3, 0],
+          baseFret: 1,
+          next: ["A", "D", "E", "Bm"],
+          caption: "4 音往 3 音解決，適合做懸念。",
+        },
+        {
+          name: "Am7",
+          root: "A",
+          quality: "minor7",
+          category: "common",
+          aliases: ["A minor 7", "A小七"],
+          frets: [null, 0, 2, 0, 1, 0],
+          baseFret: 1,
+          next: ["Dm7", "G7", "Cmaj7", "Fmaj7"],
+          caption: "ii-V-I、流行 R&B 都很常用。",
+        },
+        {
+          name: "F",
+          root: "F",
+          quality: "major",
+          category: "advanced",
+          aliases: ["F major", "F大調", "Fa"],
+          frets: [1, 3, 3, 2, 1, 1],
+          baseFret: 1,
+          next: ["G", "C", "Am", "Dm"],
+          caption: "大橫按指型，練轉位與手腕穩定。",
+        },
+        {
+          name: "Bm",
+          root: "B",
+          quality: "minor",
+          category: "advanced",
+          aliases: ["B minor", "B小調", "Sim"],
+          frets: [null, 2, 4, 4, 3, 2],
+          baseFret: 1,
+          next: ["G", "D", "A", "Em"],
+          caption: "A 小和弦封閉型，常見於 D 大調。",
+        },
+        {
+          name: "Cmaj7",
+          root: "C",
+          quality: "major7",
+          category: "advanced",
+          aliases: ["C major 7", "C大七", "C△7"],
+          frets: [null, 3, 2, 0, 0, 0],
+          baseFret: 1,
+          next: ["Am7", "Dm7", "G7", "Fmaj7"],
+          caption: "爵士與 city pop 常用的柔和主和弦。",
+        },
+        {
+          name: "Dm7",
+          root: "D",
+          quality: "minor7",
+          category: "advanced",
+          aliases: ["D minor 7", "D小七"],
+          frets: [null, null, 0, 2, 1, 1],
+          baseFret: 1,
+          next: ["G7", "Cmaj7", "Am7", "Fmaj7"],
+          caption: "ii-V-I 的 ii，往 G7 走最典型。",
+        },
+        {
+          name: "B7",
+          root: "B",
+          quality: "dominant7",
+          category: "advanced",
+          aliases: ["B dominant", "B屬七", "B 七"],
+          frets: [null, 2, 1, 2, 0, 2],
+          baseFret: 1,
+          next: ["E", "Em", "A", "C#m"],
+          caption: "有拉力的屬七，常解到 E 或 Em。",
+        },
+        {
+          name: "Gmaj7",
+          root: "G",
+          quality: "major7",
+          category: "advanced",
+          aliases: ["G major 7", "G大七", "G△7"],
+          frets: [3, null, 4, 4, 3, null],
+          baseFret: 1,
+          next: ["Cmaj7", "Am7", "D7", "Em"],
+          caption: "高把位前的好練習，聲音很柔。",
+        },
+      ];
+
+      const QUALITY_INTERVALS = {
+        major: [
+          ["1", 0],
+          ["3", 4],
+          ["5", 7],
+        ],
+        minor: [
+          ["1", 0],
+          ["b3", 3],
+          ["5", 7],
+        ],
+        dominant7: [
+          ["1", 0],
+          ["3", 4],
+          ["5", 7],
+          ["b7", 10],
+        ],
+        major7: [
+          ["1", 0],
+          ["3", 4],
+          ["5", 7],
+          ["7", 11],
+        ],
+        minor7: [
+          ["1", 0],
+          ["b3", 3],
+          ["5", 7],
+          ["b7", 10],
+        ],
+        sus4: [
+          ["1", 0],
+          ["4", 5],
+          ["5", 7],
+        ],
+        add9: [
+          ["1", 0],
+          ["3", 4],
+          ["5", 7],
+          ["9", 2],
+        ],
+      };
+
+      const searchInput = document.querySelector("#search");
+      const clearSearch = document.querySelector("#clear-search");
+      const filterTabs = document.querySelectorAll(".filter-tab");
+      const chordGrid = document.querySelector("#chord-grid");
+      const resultCount = document.querySelector("#result-count");
+      const template = document.querySelector("#chord-card-template");
+      const prevCard = document.querySelector("#prev-card");
+      const nextCard = document.querySelector("#next-card");
+      const statTotal = document.querySelector("#stat-total");
+
+      let activeFilter = "all";
+      let featuredChord = "";
+
+      statTotal.textContent = chords.length;
+
+      function noteAt(stringIndex, fret) {
+        const openIndex = NOTES.indexOf(OPEN_STRINGS[stringIndex]);
+        return NOTES[(openIndex + fret + NOTES.length * 2) % NOTES.length];
+      }
+
+      function intervalMap(chord) {
+        return new Map(
+          QUALITY_INTERVALS[chord.quality].map(([degree, offset]) => {
+            const noteIndex = (NOTES.indexOf(chord.root) + offset) % NOTES.length;
+            return [NOTES[noteIndex], degree];
+          }),
+        );
+      }
+
+      function toneList(chord) {
+        return QUALITY_INTERVALS[chord.quality].map(([degree, offset]) => {
+          const note = NOTES[(NOTES.indexOf(chord.root) + offset) % NOTES.length];
+          return { note, degree };
+        });
+      }
+
+      function getRootPositions(chord) {
+        return chord.frets
+          .map((fret, stringIndex) => ({ fret, stringIndex, note: fret === null ? null : noteAt(stringIndex, fret) }))
+          .filter((item) => item.note === chord.root);
+      }
+
+      function normalizedSearch(chord) {
+        const tones = toneList(chord)
+          .map((tone) => `${tone.note} ${tone.degree}`)
+          .join(" ");
+        return [
+          chord.name,
+          chord.root,
+          chord.quality,
+          chord.caption,
+          EMOTIONS[chord.name]?.text ?? "",
+          ...(EMOTIONS[chord.name]?.tags ?? []),
+          CATEGORY_LABELS[chord.category],
+          chord.category,
+          tones,
+          ...chord.aliases,
+          ...chord.next,
+        ]
+          .join(" ")
+          .toLowerCase();
+      }
+
+      function matchesQuery(chord, rawQuery) {
+        const query = rawQuery.trim().toLowerCase();
+        if (query === "") return true;
+
+        const chordName = chord.name.toLowerCase();
+        const root = chord.root.toLowerCase();
+        const degrees = toneList(chord).map((tone) => tone.degree.toLowerCase());
+        const notes = toneList(chord).map((tone) => tone.note.toLowerCase());
+        const category = CATEGORY_LABELS[chord.category].toLowerCase();
+        const isNoteQuery = /^[a-g](#|b)?$/.test(query);
+        const isChordQuery = /^[a-g](#|b)?(m|maj7|m7|7|sus4|add9)?$/.test(query);
+
+        if (isChordQuery && chordName.startsWith(query)) return true;
+        if (isNoteQuery && root === query) return true;
+        if (degrees.includes(query)) return true;
+        if (notes.includes(query) && query.length > 1) return true;
+        if (category.includes(query)) return true;
+        if (isChordQuery || isNoteQuery) return false;
+
+        return normalizedSearch(chord).includes(query);
+      }
+
+      function renderEmotion(panel, chord) {
+        const emotion = EMOTIONS[chord.name];
+        const meter = panel.querySelector(".emotion-meter");
+        const tags = panel.querySelector(".emotion-tags");
+        const copy = panel.querySelector(".emotion-copy");
+
+        meter.innerHTML = `張力 ${emotion.tension}/5 `;
+        for (let index = 1; index <= 5; index += 1) {
+          const dot = document.createElement("span");
+          dot.className = "meter-dot";
+          dot.classList.toggle("is-filled", index <= emotion.tension);
+          meter.appendChild(dot);
+        }
+
+        tags.innerHTML = "";
+        emotion.tags.forEach((tag) => {
+          const chip = document.createElement("span");
+          chip.className = "emotion-tag";
+          chip.textContent = tag;
+          tags.appendChild(chip);
+        });
+
+        copy.textContent = emotion.text;
+      }
+
+      function renderFretboard(fretboard, chord) {
+        fretboard.innerHTML = "";
+        const map = intervalMap(chord);
+        const maxFret = Math.max(...chord.frets.filter((fret) => fret !== null), 4);
+        const displayFrets = Math.max(4, Math.min(5, maxFret));
+        const usableTop = 34;
+        const usableHeight = 196;
+        const stringX = [7.5, 25.5, 43.5, 61.5, 79.5, 97.5];
+
+        if (chord.baseFret > 1) {
+          const base = document.createElement("span");
+          base.className = "base-fret";
+          base.textContent = `${chord.baseFret}fr`;
+          fretboard.appendChild(base);
+        }
+
+        chord.frets.forEach((fret, stringIndex) => {
+          const state = document.createElement("span");
+          state.className = "string-state";
+          state.style.left = `${stringX[stringIndex]}%`;
+          state.textContent = fret === null ? "×" : fret === 0 ? "○" : "";
+          fretboard.appendChild(state);
+
+          if (fret === null) return;
+
+          if (fret === 0) {
+            const note = noteAt(stringIndex, fret);
+            const degree = map.get(note) ?? "?";
+            const openNote = document.createElement("span");
+            openNote.className = "open-note";
+            openNote.dataset.degree = degree;
+            openNote.style.left = `${stringX[stringIndex]}%`;
+            openNote.title = `${STRING_NAMES[stringIndex]} 空弦：${note} 是 ${degree}`;
+            openNote.textContent = `${note} ${degree}`;
+            fretboard.appendChild(openNote);
+            return;
+          }
+
+          const note = noteAt(stringIndex, fret);
+          const degree = map.get(note) ?? "?";
+          const row = Math.max(1, Math.min(displayFrets, fret - chord.baseFret + 1));
+          const dot = document.createElement("span");
+          dot.className = "note-dot";
+          dot.dataset.degree = degree;
+          dot.style.left = `${stringX[stringIndex]}%`;
+          dot.style.top = `${usableTop + (row - 0.5) * (usableHeight / displayFrets)}px`;
+          dot.title = `${STRING_NAMES[stringIndex]} ${fret}格：${note} 是 ${degree}`;
+          dot.innerHTML = `<span><span class="note">${note}</span><span class="degree">${degree}</span></span>`;
+          fretboard.appendChild(dot);
+        });
+      }
+
+      function renderCard(chord) {
+        const fragment = template.content.cloneNode(true);
+        const card = fragment.querySelector(".chord-card");
+        const title = fragment.querySelector(".chord-title");
+        const subtitle = fragment.querySelector(".chord-subtitle");
+        const category = fragment.querySelector(".category-pill");
+        const fretboard = fragment.querySelector(".fretboard");
+        const toneContainer = fragment.querySelector(".tone-list");
+        const rootContainer = fragment.querySelector(".root-list");
+        const nextContainer = fragment.querySelector(".next-list");
+        const voicing = fragment.querySelector(".voicing");
+        const emotionPanel = fragment.querySelector(".emotion-panel");
+
+        card.dataset.name = chord.name;
+        card.classList.toggle("is-featured", chord.name === featuredChord);
+        title.textContent = chord.name;
+        subtitle.textContent = chord.caption;
+        category.textContent = CATEGORY_LABELS[chord.category];
+
+        renderEmotion(emotionPanel, chord);
+        renderFretboard(fretboard, chord);
+
+        toneList(chord).forEach(({ note, degree }) => {
+          const chip = document.createElement("span");
+          chip.className = "tone-chip";
+          chip.innerHTML = `<strong>${degree}</strong> ${note}`;
+          toneContainer.appendChild(chip);
+        });
+
+        const roots = getRootPositions(chord);
+        if (roots.length === 0) {
+          const chip = document.createElement("span");
+          chip.className = "root-chip";
+          chip.textContent = "此指型沒有根音";
+          rootContainer.appendChild(chip);
+        } else {
+          roots.forEach(({ stringIndex, fret }) => {
+            const chip = document.createElement("span");
+            chip.className = "root-chip";
+            chip.textContent = `${STRING_NAMES[stringIndex]} ${fret === 0 ? "空弦" : `${fret}格`}`;
+            rootContainer.appendChild(chip);
+          });
+        }
+
+        chord.next.forEach((nextName) => {
+          const chip = document.createElement("button");
+          chip.className = "next-chip";
+          chip.type = "button";
+          chip.textContent = nextName;
+          chip.addEventListener("click", () => jumpToChord(nextName));
+          nextContainer.appendChild(chip);
+        });
+
+        const voicingText = chord.frets.map((fret) => (fret === null ? "x" : fret)).join(" ");
+        voicing.innerHTML = `指型 <code>${voicingText}</code>`;
+
+        return fragment;
+      }
+
+      function currentResults() {
+        const query = searchInput.value.trim();
+        return chords.filter((chord) => {
+          const matchesFilter = activeFilter === "all" || chord.category === activeFilter;
+          const matchesSearch = matchesQuery(chord, query);
+          return matchesFilter && matchesSearch;
+        });
+      }
+
+      function render() {
+        const results = currentResults();
+        chordGrid.innerHTML = "";
+
+        if (results.length === 0) {
+          chordGrid.innerHTML = `
+            <div class="empty-state">
+              <h2>找不到符合的和弦</h2>
+              <p>可以試試根音、和弦名稱、音級，例如 C、Am、b7、常用或新手。</p>
+            </div>
+          `;
+        } else {
+          results.forEach((chord) => chordGrid.appendChild(renderCard(chord)));
+        }
+
+        const filterText = activeFilter === "all" ? "全部分類" : CATEGORY_LABELS[activeFilter];
+        resultCount.textContent = `顯示 ${results.length} 個和弦 · ${filterText}`;
+      }
+
+      function setFilter(filter) {
+        activeFilter = filter;
+        filterTabs.forEach((tab) => {
+          const isActive = tab.dataset.filter === filter;
+          tab.classList.toggle("is-active", isActive);
+          tab.setAttribute("aria-selected", String(isActive));
+        });
+        render();
+      }
+
+      function jumpToChord(name) {
+        const target = chords.find((chord) => chord.name.toLowerCase() === name.toLowerCase());
+        featuredChord = target?.name ?? "";
+        if (target) {
+          activeFilter = "all";
+          searchInput.value = target.name;
+          filterTabs.forEach((tab) => {
+            const isActive = tab.dataset.filter === "all";
+            tab.classList.toggle("is-active", isActive);
+            tab.setAttribute("aria-selected", String(isActive));
+          });
+        } else {
+          searchInput.value = name;
+        }
+        render();
+        requestAnimationFrame(() => {
+          const card = chordGrid.querySelector(".chord-card");
+          card?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+        });
+      }
+
+      filterTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          featuredChord = "";
+          setFilter(tab.dataset.filter);
+        });
+      });
+
+      searchInput.addEventListener("input", () => {
+        featuredChord = "";
+        render();
+      });
+
+      clearSearch.addEventListener("click", () => {
+        searchInput.value = "";
+        featuredChord = "";
+        searchInput.focus();
+        render();
+      });
+
+      function scrollByCard(direction) {
+        const firstCard = chordGrid.querySelector(".chord-card");
+        const distance = firstCard ? firstCard.getBoundingClientRect().width + 12 : 320;
+        chordGrid.scrollBy({ left: distance * direction, behavior: "smooth" });
+      }
+
+      prevCard.addEventListener("click", () => scrollByCard(-1));
+      nextCard.addEventListener("click", () => scrollByCard(1));
+
+      let isPointerDown = false;
+      let startX = 0;
+      let startScrollLeft = 0;
+
+      chordGrid.addEventListener("pointerdown", (event) => {
+        if (!matchMedia("(max-width: 720px)").matches) return;
+        isPointerDown = true;
+        startX = event.clientX;
+        startScrollLeft = chordGrid.scrollLeft;
+        chordGrid.classList.add("is-dragging");
+        chordGrid.setPointerCapture(event.pointerId);
+      });
+
+      chordGrid.addEventListener("pointermove", (event) => {
+        if (!isPointerDown) return;
+        chordGrid.scrollLeft = startScrollLeft - (event.clientX - startX);
+      });
+
+      chordGrid.addEventListener("pointerup", () => {
+        isPointerDown = false;
+        chordGrid.classList.remove("is-dragging");
+      });
+
+      chordGrid.addEventListener("pointercancel", () => {
+        isPointerDown = false;
+        chordGrid.classList.remove("is-dragging");
+      });
+
+      render();
+    </script>
+  </body>
+</html>

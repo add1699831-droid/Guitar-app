@@ -3,242 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>吉他開放和弦查詢器</title>
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
-      display: flex;
-      justify-content: center;
-      padding: 30px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 700px;
-      background: #1c1c1c;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      margin-bottom: 20px;
-      font-size: 16px;
-      background: #2a2a2a;
-      color: white;
-    }
-
-    .card {
-      background: #2b2b2b;
-      padding: 18px;
-      border-radius: 14px;
-      margin-top: 15px;
-    }
-
-    .title {
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #ffd54f;
-    }
-
-    .info {
-      line-height: 1.8;
-      font-size: 16px;
-    }
-
-    .diagram {
-      margin-top: 20px;
-      overflow-x: auto;
-    }
-
-    table {
-      border-collapse: collapse;
-      margin: auto;
-    }
-
-    td {
-      width: 50px;
-      height: 50px;
-      border: 2px solid #666;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 20px;
-    }
-
-    .dot {
-      width: 28px;
-      height: 28px;
-      background: #ff5252;
-      border-radius: 50%;
-      margin: auto;
-    }
-
-    .open {
-      color: #81c784;
-      font-weight: bold;
-    }
-
-    .mute {
-      color: #e57373;
-      font-weight: bold;
-    }
-
-    .strings {
-      display: flex;
-      justify-content: space-between;
-      max-width: 320px;
-      margin: auto;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-  </style>
+  <meta name="description" content="木吉他和弦查詢器（MVP）：Major / Minor / 7 / m7 / sus2 / sus4。" />
+  <title>Acoustic Guitar Chords</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <main class="layout">
+    <header class="hero">
+      <p class="eyebrow">Acoustic Guitar</p>
+      <h1>木吉他和弦查詢</h1>
+      <p class="hero-sub">極簡清爽風：只顯示已驗證按法，其他先顯示組成音。</p>
+    </header>
 
-<div class="container">
-  <h1>🎸 吉他開放和弦查詢器</h1>
+    <section class="app">
+      <aside class="panel">
+        <label for="chordSelect">選擇和弦</label>
+        <select id="chordSelect"></select>
+        <ul class="legend">
+          <li><span class="dot-legend">1</span> 建議手指</li>
+          <li><span class="open-legend">O</span> 空弦</li>
+          <li><span class="mute-legend">X</span> 悶音</li>
+        </ul>
+      </aside>
 
-  <select id="chordSelect">
-    <option value="C">C</option>
-    <option value="G">G</option>
-    <option value="D">D</option>
-    <option value="A">A</option>
-    <option value="E">E</option>
-    <option value="Am">Am</option>
-    <option value="Em">Em</option>
-    <option value="Dm">Dm</option>
-  </select>
+      <article class="card" aria-live="polite">
+        <header class="card-header">
+          <div>
+            <h2 id="chordName"></h2>
+            <p id="chordInfo" class="muted"></p>
+          </div>
+          <span id="statusBadge" class="badge"></span>
+        </header>
 
-  <div class="card">
-    <div class="title" id="chordName">C 和弦</div>
+        <div class="card-body">
+          <section class="info-col">
+            <div class="box">
+              <h3>組成音</h3>
+              <ul id="notes" class="chips"></ul>
+            </div>
+            <div class="box">
+              <h3>音程</h3>
+              <ul id="intervals" class="chips"></ul>
+            </div>
+            <div class="box">
+              <h3>六線按法</h3>
+              <p id="fingering" class="fingering">-</p>
+            </div>
+            <div class="box">
+              <h3>練習提示</h3>
+              <p id="tip" class="muted"></p>
+            </div>
+          </section>
 
-    <div class="info" id="chordInfo">
-      組成音：C E G<br>
-      按法：X32010
-    </div>
+          <section>
+            <div class="strings"><span>E</span><span>A</span><span>D</span><span>G</span><span>B</span><span>e</span></div>
+            <div id="diagramArea"></div>
+          </section>
+        </div>
+      </article>
+    </section>
+  </main>
 
-    <div class="diagram">
-      <div class="strings">
-        <div>E</div>
-        <div>A</div>
-        <div>D</div>
-        <div>G</div>
-        <div>B</div>
-        <div>e</div>
-      </div>
-
-      <table id="fretboard"></table>
-    </div>
-  </div>
-</div>
-
-<script>
-const chords = {
-  C: {
-    notes: 'C E G',
-    fingering: 'X32010',
-    frets: ['X',3,2,0,1,0]
-  },
-  G: {
-    notes: 'G B D',
-    fingering: '320003',
-    frets: [3,2,0,0,0,3]
-  },
-  D: {
-    notes: 'D F# A',
-    fingering: 'XX0232',
-    frets: ['X','X',0,2,3,2]
-  },
-  A: {
-    notes: 'A C# E',
-    fingering: 'X02220',
-    frets: ['X',0,2,2,2,0]
-  },
-  E: {
-    notes: 'E G# B',
-    fingering: '022100',
-    frets: [0,2,2,1,0,0]
-  },
-  Am: {
-    notes: 'A C E',
-    fingering: 'X02210',
-    frets: ['X',0,2,2,1,0]
-  },
-  Em: {
-    notes: 'E G B',
-    fingering: '022000',
-    frets: [0,2,2,0,0,0]
-  },
-  Dm: {
-    notes: 'D F A',
-    fingering: 'XX0231',
-    frets: ['X','X',0,2,3,1]
-  }
-};
-
-const select = document.getElementById('chordSelect');
-const chordName = document.getElementById('chordName');
-const chordInfo = document.getElementById('chordInfo');
-const fretboard = document.getElementById('fretboard');
-
-function renderChord(name) {
-  const chord = chords[name];
-
-  chordName.innerText = name + ' 和弦';
-
-  chordInfo.innerHTML = `
-    組成音：${chord.notes}<br>
-    按法：${chord.fingering}
-  `;
-
-  fretboard.innerHTML = '';
-
-  for (let fret = 0; fret < 5; fret++) {
-    const row = document.createElement('tr');
-
-    chord.frets.forEach(value => {
-      const cell = document.createElement('td');
-
-      if (fret === 0) {
-        if (value === 'X') {
-          cell.innerHTML = '<span class="mute">X</span>';
-        } else if (value === 0) {
-          cell.innerHTML = '<span class="open">O</span>';
-        } else {
-          cell.innerHTML = '';
-        }
-      }
-
-      if (value === fret && fret !== 0) {
-        cell.innerHTML = '<div class="dot"></div>';
-      }
-
-      row.appendChild(cell);
-    });
-
-    fretboard.appendChild(row);
-  }
-}
-
-select.addEventListener('change', () => {
-  renderChord(select.value);
-});
-
-renderChord('C');
-</script>
-
+  <script src="chord-data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

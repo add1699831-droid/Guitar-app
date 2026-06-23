@@ -1443,13 +1443,30 @@
       function chordBaseFret(frets) { const fretted = frets.filter((fret) => fret !== null && fret > 0); if (fretted.length === 0) return 1; const minFret = Math.min(...fretted); const maxFret = Math.max(...fretted); return maxFret <= 4 ? 1 : minFret; }
       function chordCategory(name) { if (ESSENTIAL_CHORDS.has(name)) return "beginner"; return COMMON_SUFFIXES.has(chordSuffix(name)) ? "common" : "advanced"; }
       function qualityLabel(suffix) { return QUALITY_META[suffix]?.label ?? suffix; }
-      function displayChordName(name) { return name.replace("Maj", "maj"); }
+      // 建立異名同音對照表
+      const ENHARMONIC_MAP = { "Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#" };
+
+      // 讓卡片標題與按鈕自動顯示雙名稱 (例如 Gbm7 / F#m7)
+      function displayChordName(name) { 
+        let formatted = name.replace("Maj", "maj");
+        const root = chordRoot(name);
+        if (ENHARMONIC_MAP[root]) {
+          const suffix = formatted.slice(root.length);
+          return `${formatted} / ${ENHARMONIC_MAP[root]}${suffix}`;
+        }
+        return formatted; 
+      }
+
+      // 讓副標題的文案也自動同步雙名稱
       function chordCaption(name) {
         const isSlash = name.includes('/');
         if (isSlash) return `${name} 分數和弦：以 ${name.split('/')[1]} 為低音，能讓整首歌的 Bass 線條更流暢平順。`;
+        
         const root = chordRoot(name);
         const suffix = chordSuffix(name);
-        return root + " " + qualityLabel(suffix) + "：" + (QUALITY_META[suffix]?.caption ?? "進階色彩和弦，適合當作轉折或編曲色彩。");
+        const displayRoot = ENHARMONIC_MAP[root] ? `${root} / ${ENHARMONIC_MAP[root]}` : root;
+        
+        return displayRoot + " " + qualityLabel(suffix) + "：" + (QUALITY_META[suffix]?.caption ?? "進階色彩和弦，適合當作轉折或編曲色彩。");
       }
       function wrapIndex(index) { return ((index % 12) + 12) % 12; }
       function noteIndex(note) { return NOTE_INDEX[note] ?? NOTES.indexOf(note); }

@@ -1427,7 +1427,7 @@
       function chordRoot(name) { return name.match(/^[A-G](?:#|b)?/)?.[0] ?? name; }
       function chordSuffix(name) { const suffix = name.slice(chordRoot(name).length); return suffix || "major"; }
       function parseFrets(pattern) { return pattern.split(",").map((fret) => (fret === "x" ? null : Number(fret))); }
-      function chordBaseFret(frets) { const fretted = frets.filter((fret) => fret !== null && fret > 0); if (fretted.length === 0) return 1; const minFret = Math.min(...fretted); const maxFret = Math.max(...fretted); return maxFret <= 5 ? 1 : minFret; }
+      function chordBaseFret(frets) { const fretted = frets.filter((fret) => fret !== null && fret > 0); if (fretted.length === 0) return 1; const minFret = Math.min(...fretted); const maxFret = Math.max(...fretted); return maxFret <= 4 ? 1 : minFret; }
       function chordCategory(name) { if (ESSENTIAL_CHORDS.has(name)) return "beginner"; return COMMON_SUFFIXES.has(chordSuffix(name)) ? "common" : "advanced"; }
       function qualityLabel(suffix) { return QUALITY_META[suffix]?.label ?? suffix; }
       function displayChordName(name) { return name.replace("Maj", "maj"); }

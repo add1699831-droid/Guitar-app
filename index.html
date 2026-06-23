@@ -773,10 +773,10 @@
       <header class="top-band">
         <section class="hero" aria-labelledby="page-title">
           <div>
-            <p class="eyebrow">Chord Finder</p>
+            <p class="eyebrow">Guitar Chord</p>
             <h1 id="page-title">和弦一看就懂</h1>
             <p class="hero-copy">
-              搜尋、分類、根音位置、音級與常見接法都集中在一張圖裡。從新手開放和弦到進階封閉和弦，練習時不用在多個表格之間來回跳。
+              根音位置、音名與常見接法都集中在一張圖裡。從開放和弦到封閉和弦，練習時不用在多個表格之間來回跳。
             </p>
           </div>
           <div class="stats-strip" aria-label="和弦資料摘要">
@@ -785,11 +785,11 @@
               <span>可查和弦</span>
             </div>
             <div class="stat">
-              <strong>1 3 5</strong>
-              <span>音級標示</span>
+              <strong>C E G</strong>
+              <span>音名標示</span>
             </div>
             <div class="stat">
-              <strong>b7</strong>
+              <strong>bB</strong>
               <span>七和弦辨識</span>
             </div>
           </div>
@@ -893,7 +893,7 @@
             <div class="fretboard" aria-label="和弦指型圖"></div>
             <div class="side-panel">
               <div class="info-block">
-                <p class="info-label">音級</p>
+                <p class="info-label">音名</p>
                 <div class="tone-list"></div>
               </div>
               <div class="info-block">
@@ -1651,7 +1651,8 @@
         toneList(chord).forEach(({ note, degree }) => {
           const chip = document.createElement("span");
           chip.className = "tone-chip";
-          chip.innerHTML = `<strong>${degree}</strong> ${note}`;
+          // 刪除 degree，只留下 note
+          chip.innerHTML = `<strong>${note}</strong>`; 
           toneContainer.appendChild(chip);
         });
 

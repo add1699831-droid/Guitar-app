@@ -1694,10 +1694,10 @@
           // 只比對下拉選單的根音與和弦類型
           const matchesRoot = selectedRoot === "all" || chord.root === selectedRoot;
           const matchesQuality = selectedQuality === "all" || chord.quality === selectedQuality;
-
           return matchesRoot && matchesQuality;
         });
       }
+
       function render() {
         const results = currentResults();
         chordGrid.innerHTML = "";
@@ -1706,24 +1706,84 @@
           chordGrid.innerHTML = `
             <div class="empty-state">
               <h2>找不到符合的和弦</h2>
-              <p>可以試試根音、和弦名稱、音級，例如 C、Am、b7、常用或新手。</p>
+              <p>目前的條件下沒有找到和弦，請嘗試調整根音或類型。</p>
             </div>
           `;
         } else {
           results.forEach((chord) => chordGrid.appendChild(renderCard(chord)));
         }
 
+        // 單純顯示和弦數量
         resultCount.textContent = `顯示 ${results.length} 個和弦`;
       }
 
-      function setFilter(filter) {
-        activeFilter = filter;
-        filterTabs.forEach((tab) => {
-          const isActive = tab.dataset.filter === filter;
-          tab.classList.toggle("is-active", isActive);
-          tab.setAttribute("aria-selected", String(isActive));
-        });
+      function jumpToChord(name) {
+        const target = chords.find((chord) => chord.name.toLowerCase() === name.toLowerCase());
+        featuredChord = target?.name ?? "";
+        if (target) {
+          // 讓下拉選單自動切換至目標和弦的根音與類型
+          rootSelect.value = target.root;
+          qualitySelect.value = target.quality;
+        }
         render();
+        requestAnimationFrame(() => {
+          const card = chordGrid.querySelector(".chord-card");
+          card?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+        });
+      }
+
+      // 監聽下拉選單的變化
+      rootSelect.addEventListener("change", () => {
+        featuredChord = "";
+        render();
+      });
+
+      qualitySelect.addEventListener("change", () => {
+        featuredChord = "";
+        render();
+      });
+
+      // 左右滑動按鈕功能
+      function scrollByCard(direction) {
+        const firstCard = chordGrid.querySelector(".chord-card");
+        const distance = firstCard ? firstCard.getBoundingClientRect().width + 12 : 320;
+        chordGrid.scrollBy({ left: distance * direction, behavior: "smooth" });
+      }
+
+      prevCard.addEventListener("click", () => scrollByCard(-1));
+      nextCard.addEventListener("click", () => scrollByCard(1));
+
+      // 手機版觸控滑動事件
+      let isPointerDown = false;
+      let startX = 0;
+      let startScrollLeft = 0;
+
+      chordGrid.addEventListener("pointerdown", (event) => {
+        if (!matchMedia("(max-width: 720px)").matches) return;
+        isPointerDown = true;
+        startX = event.clientX;
+        startScrollLeft = chordGrid.scrollLeft;
+        chordGrid.classList.add("is-dragging");
+        chordGrid.setPointerCapture(event.pointerId);
+      });
+
+      chordGrid.addEventListener("pointermove", (event) => {
+        if (!isPointerDown) return;
+        chordGrid.scrollLeft = startScrollLeft - (event.clientX - startX);
+      });
+
+      chordGrid.addEventListener("pointerup", () => {
+        isPointerDown = false;
+        chordGrid.classList.remove("is-dragging");
+      });
+
+      chordGrid.addEventListener("pointercancel", () => {
+        isPointerDown = false;
+        chordGrid.classList.remove("is-dragging");
+      });
+
+      // 初始渲染畫面
+      render();
       }
 
      function jumpToChord(name) {

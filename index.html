@@ -1449,7 +1449,6 @@
       }
       function compareChordNames([nameA], [nameB]) { const rootDelta = ROOT_SORT.indexOf(chordRoot(nameA)) - ROOT_SORT.indexOf(chordRoot(nameB)); if (rootDelta !== 0) return rootDelta; return QUALITY_SORT.indexOf(chordSuffix(nameA)) - QUALITY_SORT.indexOf(chordSuffix(nameB)); }
       const chords = Object.entries(MUSICCA_GUITAR_POSITIONS).sort(compareChordNames).map(([name, pattern]) => { const frets = parseFrets(pattern); return { name, root: chordRoot(name), quality: chordSuffix(name), category: chordCategory(name), aliases: chordAliases(name), frets, baseFret: chordBaseFret(frets), next: nextChordNames(name), caption: chordCaption(name) }; });
-
       const QUALITY_INTERVALS = {
         major: [["1", 0], ["3", 4], ["5", 7]],
         m: [["1", 0], ["b3", 3], ["5", 7]],
@@ -1481,7 +1480,7 @@
         "7b9": [["1", 0], ["3", 4], ["5", 7], ["b7", 10], ["b9", 1]],
         "7#9": [["1", 0], ["3", 4], ["5", 7], ["b7", 10], ["#9", 3]],
       };
-      const chords = Object.entries(MUSICCA_GUITAR_POSITIONS).sort(compareChordNames).map(([name, pattern]) => { const frets = parseFrets(pattern); return { name, root: chordRoot(name), quality: chordSuffix(name), category: chordCategory(name), aliases: chordAliases(name), frets, baseFret: chordBaseFret(frets), next: nextChordNames(name), caption: chordCaption(name) }; });
+      
       const rootSelect = document.querySelector("#rootSelect");
       const qualitySelect = document.querySelector("#qualitySelect");
       const chordGrid = document.querySelector("#chord-grid");

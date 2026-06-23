@@ -832,15 +832,6 @@
               <option value="5">五度和弦 (Power Chord)</option>
             </select>
           </div>
-
-          <div class="filter-tabs" role="tablist" aria-label="分類篩選">
-            <button class="filter-tab is-active" type="button" data-filter="all" role="tab">
-              全部
-            </button>
-            <button class="filter-tab" type="button" data-filter="beginner" role="tab">新手</button>
-            <button class="filter-tab" type="button" data-filter="common" role="tab">常用</button>
-            <button class="filter-tab" type="button" data-filter="advanced" role="tab">進階</button>
-          </div>
         </div>
       </section>
 
@@ -1493,7 +1484,6 @@
 
       const rootSelect = document.querySelector("#rootSelect");
       const qualitySelect = document.querySelector("#qualitySelect");
-      const filterTabs = document.querySelectorAll(".filter-tab");
       const chordGrid = document.querySelector("#chord-grid");
       const resultCount = document.querySelector("#result-count");
       const template = document.querySelector("#chord-card-template");
@@ -1501,7 +1491,6 @@
       const nextCard = document.querySelector("#next-card");
       const statTotal = document.querySelector("#stat-total");
 
-      let activeFilter = "all";
       let featuredChord = "";
 
       statTotal.textContent = chords.length;
@@ -1697,22 +1686,18 @@
         return fragment;
       }
 
-      function currentResults() {
+     function currentResults() {
         const selectedRoot = rootSelect.value;
         const selectedQuality = qualitySelect.value;
 
         return chords.filter((chord) => {
-          // 1. 分類頁籤篩選（全部、新手、常用、進階）
-          const matchesFilter = activeFilter === "all" || chord.category === activeFilter;
-          // 2. 下拉選單根音比對
+          // 只比對下拉選單的根音與和弦類型
           const matchesRoot = selectedRoot === "all" || chord.root === selectedRoot;
-          // 3. 下拉選單和弦類型比對
           const matchesQuality = selectedQuality === "all" || chord.quality === selectedQuality;
 
-          return matchesFilter && matchesRoot && matchesQuality;
+          return matchesRoot && matchesQuality;
         });
       }
-
       function render() {
         const results = currentResults();
         chordGrid.innerHTML = "";
@@ -1728,8 +1713,7 @@
           results.forEach((chord) => chordGrid.appendChild(renderCard(chord)));
         }
 
-        const filterText = activeFilter === "all" ? "全部分類" : CATEGORY_LABELS[activeFilter];
-        resultCount.textContent = `顯示 ${results.length} 個和弦 · ${filterText}`;
+        resultCount.textContent = `顯示 ${results.length} 個和弦`;
       }
 
       function setFilter(filter) {
@@ -1742,20 +1726,13 @@
         render();
       }
 
-      function jumpToChord(name) {
+     function jumpToChord(name) {
         const target = chords.find((chord) => chord.name.toLowerCase() === name.toLowerCase());
         featuredChord = target?.name ?? "";
         if (target) {
-          activeFilter = "all";
           // 讓下拉選單自動切換至目標和弦的根音與類型
           rootSelect.value = target.root;
           qualitySelect.value = target.quality;
-          
-          filterTabs.forEach((tab) => {
-            const isActive = tab.dataset.filter === "all";
-            tab.classList.toggle("is-active", isActive);
-            tab.setAttribute("aria-selected", String(isActive));
-          });
         }
         render();
         requestAnimationFrame(() => {
@@ -1763,13 +1740,12 @@
           card?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
         });
       }
-
-      filterTabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
-          featuredChord = "";
-          setFilter(tab.dataset.filter);
+        render();
+        requestAnimationFrame(() => {
+          const card = chordGrid.querySelector(".chord-card");
+          card?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
         });
-      });
+      }
 
       rootSelect.addEventListener("change", () => {
         featuredChord = "";

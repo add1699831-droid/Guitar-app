@@ -346,10 +346,11 @@
 
       .base-fret {
         position: absolute;
-        left: 8px;
-        top: 41px;
-        color: var(--muted);
-        font-size: 0.78rem;
+        left: -26px;      /* 往左移出格子，推到你畫紅圈的位置 */
+        top: 52px;        /* 微調高度，讓它剛好對齊上方那條粗黑線 */
+        color: var(--ink); /* 加深顏色讓它更清楚 */
+        font-size: 0.85rem; /* 字體稍微放大 */
+        font-weight: 700;   /* 字體加粗 */
       }
 
       .string-state {

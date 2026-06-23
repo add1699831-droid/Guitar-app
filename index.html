@@ -1607,7 +1607,7 @@
             openNote.dataset.degree = degree;
             openNote.style.left = `${stringX[stringIndex]}%`;
             openNote.title = `${STRING_NAMES[stringIndex]} 空弦：${note} 是 ${degree}`;
-            openNote.textContent = `${note} ${degree}`;
+            openNote.textContent = note;
             fretboard.appendChild(openNote);
             return;
           }
@@ -1621,7 +1621,7 @@
           dot.style.left = `${stringX[stringIndex]}%`;
           dot.style.top = `${usableTop + (row - 0.5) * (usableHeight / displayFrets)}px`;
           dot.title = `${STRING_NAMES[stringIndex]} ${fret}格：${note} 是 ${degree}`;
-          dot.innerHTML = `<span><span class="note">${note}</span><span class="degree">${degree}</span></span>`;
+          dot.innerHTML = `<span class="note">${note}</span>`;
           fretboard.appendChild(dot);
         });
       }

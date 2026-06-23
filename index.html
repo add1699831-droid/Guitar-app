@@ -1423,17 +1423,34 @@
               "Gb5": "2,4,4,x,x,x",
               "Gb7b5": "2,x,2,3,1,0",
               "Gb7b9": "2,1,2,0,2,0",
-              "Gb7#9": "2,0,2,3,2,0"
+              "Gb7#9": "2,0,2,3,2,0",
+              "G/B": "x,2,0,0,3,3",
+              "C/G": "3,3,2,0,1,0",
+              "D/F#": "2,0,0,2,3,2",
+              "A/C#": "x,4,2,2,2,0",
+              "E/G#": "4,x,2,4,5,x",
+              "F/C": "x,3,3,2,1,1",
+              "Am/G": "3,0,2,2,1,0"
       };
 
       function chordRoot(name) { return name.match(/^[A-G](?:#|b)?/)?.[0] ?? name; }
-      function chordSuffix(name) { const suffix = name.slice(chordRoot(name).length); return suffix || "major"; }
+      function chordSuffix(name) {
+        let suffix = name.slice(chordRoot(name).length);
+        if (suffix.includes('/')) suffix = suffix.split('/')[0]; // 分離斜線，將 G/B 視為 G major
+        return suffix || "major";
+      }
       function parseFrets(pattern) { return pattern.split(",").map((fret) => (fret === "x" ? null : Number(fret))); }
       function chordBaseFret(frets) { const fretted = frets.filter((fret) => fret !== null && fret > 0); if (fretted.length === 0) return 1; const minFret = Math.min(...fretted); const maxFret = Math.max(...fretted); return maxFret <= 4 ? 1 : minFret; }
       function chordCategory(name) { if (ESSENTIAL_CHORDS.has(name)) return "beginner"; return COMMON_SUFFIXES.has(chordSuffix(name)) ? "common" : "advanced"; }
       function qualityLabel(suffix) { return QUALITY_META[suffix]?.label ?? suffix; }
       function displayChordName(name) { return name.replace("Maj", "maj"); }
-      function chordCaption(name) { const root = chordRoot(name); const suffix = chordSuffix(name); return root + " " + qualityLabel(suffix) + ":" + (QUALITY_META[suffix]?.caption ?? "進階色彩和弦，適合當作轉折或編曲色彩。"); }
+      function chordCaption(name) {
+        const isSlash = name.includes('/');
+        if (isSlash) return `${name} 分數和弦：以 ${name.split('/')[1]} 為低音，能讓整首歌的 Bass 線條更流暢平順。`;
+        const root = chordRoot(name);
+        const suffix = chordSuffix(name);
+        return root + " " + qualityLabel(suffix) + "：" + (QUALITY_META[suffix]?.caption ?? "進階色彩和弦，適合當作轉折或編曲色彩。");
+      }
       function wrapIndex(index) { return ((index % 12) + 12) % 12; }
       function noteIndex(note) { return NOTE_INDEX[note] ?? NOTES.indexOf(note); }
       function displayNoteByIndex(index, preferFlat = false) { return (preferFlat ? FLAT_NOTES : NOTES)[wrapIndex(index)]; }
@@ -1502,7 +1519,19 @@
 
       function intervalMap(chord) { const intervals = QUALITY_INTERVALS[chord.quality] ?? QUALITY_INTERVALS.major; return new Map(intervals.map(([degree, offset]) => [wrapIndex(noteIndex(chord.root) + offset), degree])); }
 
-      function toneList(chord) { const intervals = QUALITY_INTERVALS[chord.quality] ?? QUALITY_INTERVALS.major; const preferFlat = chord.root.includes("b"); return intervals.map(([degree, offset]) => ({ note: displayNoteByIndex(noteIndex(chord.root) + offset, preferFlat), degree })); }
+      function toneList(chord) {
+        const intervals = QUALITY_INTERVALS[chord.quality] ?? QUALITY_INTERVALS.major;
+        const preferFlat = chord.root.includes("b");
+        const tones = intervals.map(([degree, offset]) => ({ note: displayNoteByIndex(noteIndex(chord.root) + offset, preferFlat), degree }));
+        // 如果是分數和弦，確保低音有顯示在組成音中
+        if (chord.name.includes('/')) {
+          const bassNote = chord.name.split('/')[1];
+          if (!tones.some(t => t.note === bassNote)) {
+            tones.push({ note: bassNote, degree: 'Bass' });
+          }
+        }
+        return tones;
+      }
 
       function getRootPositions(chord) { return chord.frets.map((fret, stringIndex) => ({ fret, stringIndex, note: fret === null ? null : noteAt(stringIndex, fret) })).filter((item) => item.note !== null && noteIndex(item.note) === noteIndex(chord.root)); }
 

@@ -1698,11 +1698,18 @@
       }
 
       function currentResults() {
-        const query = searchInput.value.trim();
+        const selectedRoot = rootSelect.value;
+        const selectedQuality = qualitySelect.value;
+
         return chords.filter((chord) => {
+          // 1. 分類頁籤篩選（全部、新手、常用、進階）
           const matchesFilter = activeFilter === "all" || chord.category === activeFilter;
-          const matchesSearch = matchesQuery(chord, query);
-          return matchesFilter && matchesSearch;
+          // 2. 下拉選單根音比對
+          const matchesRoot = selectedRoot === "all" || chord.root === selectedRoot;
+          // 3. 下拉選單和弦類型比對
+          const matchesQuality = selectedQuality === "all" || chord.quality === selectedQuality;
+
+          return matchesFilter && matchesRoot && matchesQuality;
         });
       }
 
@@ -1740,14 +1747,15 @@
         featuredChord = target?.name ?? "";
         if (target) {
           activeFilter = "all";
-          searchInput.value = displayChordName(target.name);
+          // 讓下拉選單自動切換至目標和弦的根音與類型
+          rootSelect.value = target.root;
+          qualitySelect.value = target.quality;
+          
           filterTabs.forEach((tab) => {
             const isActive = tab.dataset.filter === "all";
             tab.classList.toggle("is-active", isActive);
             tab.setAttribute("aria-selected", String(isActive));
           });
-        } else {
-          searchInput.value = name;
         }
         render();
         requestAnimationFrame(() => {
@@ -1763,15 +1771,13 @@
         });
       });
 
-      searchInput.addEventListener("input", () => {
+      rootSelect.addEventListener("change", () => {
         featuredChord = "";
         render();
       });
 
-      clearSearch.addEventListener("click", () => {
-        searchInput.value = "";
+      qualitySelect.addEventListener("change", () => {
         featuredChord = "";
-        searchInput.focus();
         render();
       });
 

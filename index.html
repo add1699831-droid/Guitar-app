@@ -1432,7 +1432,7 @@
       function qualityLabel(suffix) { return QUALITY_META[suffix]?.label ?? suffix; }
       function displayChordName(name) { return name.replace("Maj", "maj"); }
       function chordAliases(name) { const root = chordRoot(name); const suffix = chordSuffix(name); const label = qualityLabel(suffix); return [name.replace("Maj", "maj"), root + " " + label, root + (suffix === "major" ? " major" : " " + suffix)]; }
-      function chordCaption(name) { const root = chordRoot(name); const suffix = chordSuffix(name); return root + " " + qualityLabel(suffix) + "?" + (QUALITY_META[suffix]?.caption ?? "進階色彩和弦，適合當作轉折或編曲色彩。"); }
+      function chordCaption(name) { const root = chordRoot(name); const suffix = chordSuffix(name); return root + " " + qualityLabel(suffix) + ":" + (QUALITY_META[suffix]?.caption ?? "進階色彩和弦，適合當作轉折或編曲色彩。"); }
       function wrapIndex(index) { return ((index % 12) + 12) % 12; }
       function noteIndex(note) { return NOTE_INDEX[note] ?? NOTES.indexOf(note); }
       function displayNoteByIndex(index, preferFlat = false) { return (preferFlat ? FLAT_NOTES : NOTES)[wrapIndex(index)]; }
@@ -1564,7 +1564,7 @@
         const meter = panel.querySelector(".emotion-meter");
         const tags = panel.querySelector(".emotion-tags");
         const copy = panel.querySelector(".emotion-copy");
-        meter.innerHTML = "?? " + emotion.tension + "/5 ";
+        meter.innerHTML = "難度 " + emotion.tension + "/5 ";
         for (let index = 1; index <= 5; index += 1) { const dot = document.createElement("span"); dot.className = "meter-dot"; dot.classList.toggle("is-filled", index <= emotion.tension); meter.appendChild(dot); }
         tags.innerHTML = "";
         emotion.tags.forEach((tag) => { const chip = document.createElement("span"); chip.className = "emotion-tag"; chip.textContent = tag; tags.appendChild(chip); });
